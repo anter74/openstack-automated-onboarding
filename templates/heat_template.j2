@@ -1,0 +1,56 @@
+---
+heat_template_version: 2015-10-15
+description: Testing
+resources:
+{% for item in project %}
+  {{ item.name }}:
+    type: OS::Keystone::Project
+    properties:
+      name: {{ item.name }}
+{% for net in item.networks %}
+  {{ net.name }}:
+    type: OS::Neutron::Net
+    depends_on: {{ item.name }}
+    properties:
+      name: {{ net.name }}
+      tenant_id: {{ '{ get_resource:' }} {{ item.name}} {{ '}' }}
+{% if net.subnet is defined %}
+  {{ net.subnet.name }}:
+    type: OS::Neutron::Subnet
+    depends_on: {{ net.name }}
+    properties:
+      name: {{ net.subnet.name }}
+      network_id: {{ '{ get_resource:' }} {{ net.name}} {{ '}' }}
+      cidr: {{ net.subnet.cidr }}
+      enable_dhcp: {{ net.subnet.enable_dhcp }}
+{% if net.subnet.enable_dhcp == true %}
+      allocation_pools: [{ "start": "{{net.subnet.pool_allocation[0] }}", "end": "{{ net.subnet.pool_allocation[1] }}" }]
+{% endif %}{# enable_dhcp == true #}
+      tenant_id: {{ '{ get_resource:' }} {{ item.name}} {{ '}' }}
+{% endif %}{# subnet is defined #}
+{% endfor %}{# item.networks #}
+{% for instance in item.instances %}
+  {{ instance.name }}:
+    type: OS::Nova::Server
+    depends_on: [{% for nic in instance.nics %}{{ nic.name }}{% if not loop.last %},{% endif %}{% endfor %}]
+    properties:
+      name: {{ instance.name }}
+      flavor: {{ instance.flavor }}
+      image: {{ instance.image }}
+      tenant_id: {{ '{ get_resource:' }} {{ item.name}} {{ '}' }}
+      networks: [{ {% for nic in instance.nics %}"port": {{ '{ get_resource:' }} {{ nic.name}} {{ '}' }}{% if not loop.last %},{% endif %}{% endfor %} }]
+{% if instance.nics is defined %}
+{% for nic in instance.nics %}
+  {{ nic.name }}:
+    type: OS::Neutron::Port
+    depends_on: {{ nic.network }}
+    properties:
+      name: {{ nic.name }}
+      network: {{ '{ get_resource:' }} {{ nic.network }} {{ '}' }}
+{% if nic.fixed_ips is defined %}
+      fixed_ips: [{ "ip_address": "{{ nic.fixed_ips }}" }]
+{% endif %}{# port.fixed_ips is defined #}
+{% endfor %}{# instance.nics #}
+{% endif %}{# instance.nics is defined #}
+{% endfor %}{# item.instances #}
+{% endfor %}{# end item loop #}

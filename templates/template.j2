@@ -1,0 +1,17 @@
+{% for item in project %}
+---
+- name: "Create Project"
+  os_project:
+    state: present
+    name: {{ item.name }}
+    enabled: true
+- name: "Update Quotas"
+  os_quota:
+    name: {{ item.name }}
+    instances: {{ item.quota.instances }}
+    cores: {{ item.quota.cores }}
+    ram: {{ item.quota.ram }}
+    volumes: {{ item.quota.volumes }}
+    snapshots: {{ item.quota.snapshots }}
+    gigabytes: {{ item.quota.gigabytes }}
+{% endfor %}
