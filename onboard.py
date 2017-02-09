@@ -60,21 +60,29 @@ def refreshToken(url, token):
         return token
 
 def main():
-
+    #Create jinja2 environment for rendering heat templates
     env = Environment(loader = PackageLoader('onboard','templates'), trim_blocks=True)
     template = env.get_template('heat_template.j2')
+    #Read descriptor yaml file
     stream = file('vars.yml', 'r')
     templateVars = yaml.load(stream)
     stream.close()
+    #Render jinja2 template to create heat template
     print template.render(templateVars)
-
 
     URL = 'https://10.75.25.138:13000/v2.0'
     token = getToken(URL)
     if str(token['code']) == "200":
 
+    else:
+        print "Response Code: %s" % token['code']
+        print "Failure Reason: %s" % token['data']
+
+if __name__ == "__main__":
+   main()
 
         '''
+        #Test API call
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': str(token['token_id'])}
         print headers
         http = urllib3.PoolManager(
@@ -87,122 +95,3 @@ def main():
             headers=headers)
         print novaList.data
         '''
-    else:
-        print "Response Code: %s" % token['code']
-        print "Failure Reason: %s" % token['data']
-
-if __name__ == "__main__":
-   main()
-
-'''
----
-heat_template_version: 2015-10-15
-description: Testing
-resources:
-
-  ansible_test:
-    type: OS::Keystone::Project
-    properties:
-      name: ansible_test
-
-
-  ansible_test_mgmt:
-    type: OS::Neutron::Net
-    depends_on: ansible_test
-    properties:
-      name: ansible_test_mgmt
-      tenant_id: { get_resource: ansible_test }
-
-  ansible_test_mgmt_sub:
-    type: OS::Neutron::Subnet
-    depends_on: ansible_test_mgmt
-    properties:
-      name: ansible_test_mgmt_sub
-      network_id: { get_resource: ansible_test_mgmt }
-      cidr: 10.0.0.0/24
-      enable_dhcp: False
-
-      tenant_id: { get_resource: ansible_test }
-
-
-  ansible_test_sig:
-    type: OS::Neutron::Net
-    depends_on: ansible_test
-    properties:
-      name: ansible_test_sig
-      tenant_id: { get_resource: ansible_test }
-
-  ansible_test_sig_sub:
-    type: OS::Neutron::Subnet
-    depends_on: ansible_test_sig
-    properties:
-      name: ansible_test_sig_sub
-      network_id: { get_resource: ansible_test_sig }
-      cidr: 10.1.0.0/24
-      enable_dhcp: True
-
-      allocation_pools: [{ "start": "10.1.0.100", "end": "10.1.0.200" }]
-
-      tenant_id: { get_resource: ansible_test }
-
-
-
-  ansible_test_vm1:
-    type: OS::Nova::Server
-    depends_on: [ansible_test_mgmt_port1,ansible_test_sig_port1]
-    properties:
-      name: ansible_test_vm1
-      flavor: m1.small
-      image: centos-7-x86_64-v4-core
-      tenant_id: { get_resource: ansible_test }
-      networks: [{ "port": { get_resource: ansible_test_mgmt_port1 },"port": { get_resource: ansible_test_sig_port1 } }]
-
-
-  ansible_test_mgmt_port1:
-    type: OS::Neutron::Port
-    depends_on: ansible_test_mgmt
-    properties:
-      name: ansible_test_mgmt_port1
-      network: { get_resource: ansible_test_mgmt }
-
-      fixed_ips: [{ "ip_address": "10.0.0.10" }]
-
-
-  ansible_test_sig_port1:
-    type: OS::Neutron::Port
-    depends_on: ansible_test_sig
-    properties:
-      name: ansible_test_sig_port1
-      network: { get_resource: ansible_test_sig }
-
-
-
-
-  ansible_test_vm2:
-    type: OS::Nova::Server
-    depends_on: [ansible_test_mgmt_port2,ansible_test_mgmt_port2]
-    properties:
-      name: ansible_test_vm2
-      flavor: m1.small
-      image: centos-7-x86_64-v4-core
-      tenant_id: { get_resource: ansible_test }
-      networks: [{ "port": { get_resource: ansible_test_mgmt_port2 },"port": { get_resource: ansible_test_mgmt_port2 } }]
-
-
-  ansible_test_mgmt_port2:
-    type: OS::Neutron::Port
-    depends_on: ansible_test_mgmt
-    properties:
-      name: ansible_test_mgmt_port2
-      network: { get_resource: ansible_test_mgmt }
-
-      fixed_ips: [{ "ip_address": "['10.0.0.11']" }]
-
-
-  ansible_test_mgmt_port2:
-    type: OS::Neutron::Port
-    depends_on: ansible_test_sig
-    properties:
-      name: ansible_test_mgmt_port2
-      network: { get_resource: ansible_test_sig }
-'''
