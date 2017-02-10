@@ -53,7 +53,7 @@ def getToken():
 def refreshToken(token):
     #If current time is greater or equal to epoch time of token's expiration, call getToken to refresh
     if time.time() >= str(datetime.strptime(token['expires'], "%Y-%m-%dT%H:%M:%SZ")):
-        token = getToken(os.environ['OS_AUTH_URL'])
+        token = getToken()
         return token
     #Else, return the existing token back
     else:
