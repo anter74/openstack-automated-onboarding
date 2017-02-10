@@ -8,62 +8,12 @@ import json
 import urllib3
 import yaml
 from jinja2 import Environment, PackageLoader
+from osident import osident
 
 #Libraries for dealing with auth token
 import time
 from calendar import timegm
 from datetime import datetime
-
-# Get initial token from Keystone API
-def getToken():
-    url = os.environ['OS_AUTH_URL'] + '/tokens'
-    headers = {'Content-Type': 'application/json'}
-
-    http = urllib3.PoolManager(
-        cert_reqs = 'CERT_REQUIRED',
-        ca_certs = os.environ['OS_CACERT']
-        )
-    jsonPayload = json.dumps({'auth' : {'tenantName' : os.environ['OS_TENANT_NAME'], 'passwordCredentials' : {'username' : os.environ['OS_USERNAME'], 'password' : os.environ['OS_PASSWORD']}}})
-    req = http.request(
-        'POST',
-        url,
-        headers=headers,
-        body=jsonPayload
-        )
-    data = json.loads(req.data)
-    if req.status == 200:
-        #Parse and cleanup services JSON
-        services = []
-        #Pull name from serviceCatalog
-        for index, service in enumerate(data['access']['serviceCatalog']):
-            dictbuilder = {'name': service['name']}
-            #Pull publicURL from serviceCatalog
-            for k,v in enumerate(service['endpoints']):
-                dictbuilder.update({'publicURL': v['publicURL']})
-            services.append(dictbuilder)
-
-                #Build response dict for return
-        response = {'code': req.status, 'token_id': data['access']['token']['id'], 'expires': data['access']['token']['expires'], 'services': services}
-        return response
-    else:
-        failure = {'code': req.status, 'data': data}
-        return failure
-
-# Check token for freshness and renew if necessary
-def refreshToken(token):
-    #If current time is greater or equal to epoch time of token's expiration, call getToken to refresh
-    if time.time() >= str(datetime.strptime(token['expires'], "%Y-%m-%dT%H:%M:%SZ")):
-        token = getToken()
-        return token
-    #Else, return the existing token back
-    else:
-        return token
-
-#Retrieve Correct Service URL for API Call
-def getServiceURL(token, service):
-    token = refreshToken(token)
-    urlBuilder = [i['publicURL'] for i in token['services'] if i['name'] == service]
-    return str(urlBuilder[0])
 
 def main():
     #Create jinja2 environment for rendering heat templates
@@ -76,13 +26,14 @@ def main():
     #Render jinja2 template to create heat template
     #print template.render(templateVars)
 
-    token = getToken()
+    identity = osident()
+    token = identity.getToken()
     if str(token['code']) == "200":
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': str(token['token_id'])}
         http = urllib3.PoolManager(
             cert_reqs = 'CERT_REQUIRED',
             ca_certs = os.environ['OS_CACERT'])
-        novaListURL = str(getServiceURL(token,"nova")) + "/os-hypervisors/statistics"
+        novaListURL = str(identity.getServiceURL(token,"nova")) + "/os-hypervisors/statistics"
         novaList = http.request(
             'GET',
             novaListURL,
