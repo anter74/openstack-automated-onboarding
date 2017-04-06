@@ -1,45 +1,44 @@
 ---
 project:
-  - name: ansible_test
-    quota:
-      cores: 4
-      instances: 1
-      volumes: 1
-      snapshots: 1
-      gigabytes: 10
-      ram: 4096
-    networks:
-      - name: ansible_test_mgmt
-        subnet:
-          name: ansible_test_mgmt_sub
-          cidr: 10.0.0.0/24
-          enable_dhcp: false
-
-      - name: ansible_test_sig
-        subnet:
-          name: ansible_test_sig_sub
-          cidr: 10.1.0.0/24
-          enable_dhcp: true
-          pool_allocation: [ 10.1.0.100, 10.1.0.200 ]
-        ports:
-          - name: ansible_test_sig_port1
-          - name: ansible_test_sig_port2
-    instances:
-      - name: ansible_test_vm1
-        flavor: m1.small
-        image: centos-7-x86_64-v4-core
-        nics:
-          - name: ansible_test_mgmt_port1
-            network: ansible_test_mgmt
-            fixed_ips: 10.0.0.10
-          - name: ansible_test_sig_port1
-            network: ansible_test_sig
-      - name: ansible_test_vm2
-        flavor: m1.small
-        image: centos-7-x86_64-v4-core
-        nics:
-          - name: ansible_test_mgmt_port2
-            network: ansible_test_mgmt
-            fixed_ips: [ 10.0.0.11 ]
-          - name: ansible_test_mgmt_port2
-            network: ansible_test_sig
+  name: ansible_test
+  quota:
+    cores: 4
+    instances: 1
+    volumes: 1
+    snapshots: 1
+    gigabytes: 10
+    ram: 4096
+  networks:
+    - name: ansible_test_mgmt
+      subnet:
+        name: ansible_test_mgmt_sub
+        cidr: 10.0.0.0/24
+        enable_dhcp: false
+    - name: ansible_test_sig
+      subnet:
+        name: ansible_test_sig_sub
+        cidr: 10.1.0.0/24
+        enable_dhcp: true
+        pool_allocation: [ 10.1.0.100, 10.1.0.200 ]
+      ports:
+        - name: ansible_test_sig_port1
+        - name: ansible_test_sig_port2
+  instances:
+    - name: ansible_test_vm1
+      flavor: m1.small
+      image: centos-7-x86_64-v4-core
+      nics:
+        - name: ansible_test_mgmt_port1
+          network: ansible_test_mgmt
+          fixed_ips: 10.0.0.10
+        - name: ansible_test_sig_port1
+          network: ansible_test_sig
+    - name: ansible_test_vm2
+      flavor: m1.small
+      image: centos-7-x86_64-v4-core
+      nics:
+        - name: ansible_test_mgmt_port2
+          network: ansible_test_mgmt
+          fixed_ips: [ 10.0.0.11 ]
+        - name: ansible_test_mgmt_port2
+          network: ansible_test_sig

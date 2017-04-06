@@ -1,0 +1,16 @@
+---
+heat_template_version: 2015-10-15
+description: Testing
+resources:
+  ansible_test:
+    type: OS::Keystone::Project
+    properties:
+      name: ansible_test
+  ansible_test_quota:
+    type: OS::Nova::quota
+    properties:
+      project: ansible_test
+      instances: 1
+      cores: 4
+      ram: 4096
+      floating_ips: 
