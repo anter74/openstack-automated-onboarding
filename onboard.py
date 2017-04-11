@@ -9,40 +9,58 @@ import urllib3
 import yaml
 from jinja2 import Environment, PackageLoader
 from osident import osident
+import keystoneclient.v2_0.client as ksclient
 
 def main():
     #Create jinja2 environment for rendering heat templates
-    env = Environment(loader = PackageLoader('onboard','templates'), trim_blocks=True)
-    template = env.get_template('template.j2')
+    #env = Environment(loader = PackageLoader('onboard','templates'), trim_blocks=True)
+    #template = env.get_template('template.j2')
+
     #Read descriptor yaml file
     stream = file('vars.yml', 'r')
     templateVars = yaml.load(stream)
     stream.close()
+
     #Render jinja2 template to create heat template
-    stream = open('project.yml', 'w')
-    stream.write(template.render(templateVars))
-    stream.close()
-'''
+    #stream = open('project.yml', 'w')
+    #stream.write(template.render(templateVars))
+    #stream.close()
+
     #Create new identity object for OS token management
     identity = osident()
     token = identity.getToken()
     if str(token['code']) == "200":
+        # Create openstack project
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': str(token['token_id'])}
         http = urllib3.PoolManager(
             cert_reqs = 'CERT_REQUIRED',
             ca_certs = os.environ['OS_CACERT'])
-        url = str(identity.getServiceURL(token,"heat")) + "/stacks"
+
+        #url = str(identity.getServiceURL(token,"keystone")) + "/tenants"
+        url = "http://172.16.0.120:35357/v2.0/tenants/"
         request = http.request(
             'GET',
             url,
-            headers=headers
-        )
-        print request.data
-
+            headers=headers)
+        data = json.loads(request.data)
+        for i in enumerate(data['tenants']):
+            if i[1]['name'] == templateVars['project']['name']:
+                print i[1]['name']
+                print "Project %s already exists... Moving on" % i[1]['name']
+                break
+        else:
+            url = "http://172.16.0.120:35357/v2.0/tenants"
+            print url
+            jsonPayload = json.dumps({ "tenant": { "name": templateVars['project']['name'], "Description": "Created with onboard.py", "enabled": True}})
+            request = http.request(
+                'POST',
+                url,
+                headers=headers,
+                body=jsonPayload)
+            print request.status, request.data
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
-'''
 
 if __name__ == "__main__":
    main()
