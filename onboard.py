@@ -50,14 +50,14 @@ def main():
                 break
         else:
             url = "http://172.16.0.120:35357/v2.0/tenants"
-            print url
             jsonPayload = json.dumps({ "tenant": { "name": templateVars['project']['name'], "Description": "Created with onboard.py", "enabled": True}})
             request = http.request(
                 'POST',
                 url,
                 headers=headers,
                 body=jsonPayload)
-            print request.status, request.data
+            response = json.loads(request.data)
+            print response
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
@@ -80,4 +80,5 @@ if __name__ == "__main__":
   ],
 'token_id': u'01d62302dfc845efaac3da38efbbf785', 'code': 200, 'expires': u'2017-02-10T18:46:59Z'
 }
+kgreenwell user id: 1eac5ee4ba584fe8809710c32ee710d3
 '''
