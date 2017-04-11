@@ -88,7 +88,7 @@ def main():
                         'PUT',
                         url,
                         headers=headers)
-                        print json.loads(request.data)
+                    print json.loads(request.data)
 
     else:
         print "Response Code: %s" % token['code']
