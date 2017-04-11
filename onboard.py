@@ -71,15 +71,25 @@ def main():
         for i in enumerate(data['roles']):
             if i[1]['name'] == "_member_":
                 memberId = i[1]['id']
-        # assign member role to kgreenwell user for new project
-        user = "1eac5ee4ba584fe8809710c32ee710d3"
-        url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user, memberId)
-        print url
+
+        # get openstack user list
+        url = "http://172.16.0.120:35357/v2.0/users
         request = http.request(
-            'PUT',
+            'GET',
             url,
             headers=headers)
-        project = json.loads(request.data)
+        users = json.loads(request.data)
+        # assign member role to kgreenwell user for new project
+        for i in enumerate(templateVars['project']['members']):
+            for user in enumerate(users['users']):
+                if i['name'] in user['name']:
+                    url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user, memberId)
+                    request = http.request(
+                        'PUT',
+                        url,
+                        headers=headers)
+                        print json.loads(request.data)
+
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
