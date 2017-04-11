@@ -46,7 +46,6 @@ def main():
         for i in enumerate(data['tenants']):
             if i[1]['name'] == templateVars['project']['name']:
                 print "%s already exists with ID %s" % (i[1]['name'], i[1]['id'])
-                print "Project %s already exists... Moving on" % i[1]['name']
                 project = i[1]
                 break
         else:
@@ -58,8 +57,9 @@ def main():
                 headers=headers,
                 body=jsonPayload)
             project = json.loads(request.data)
-            print "Project Name: %s" % project['tenant']['name']
-            print "project ID: %s" % project['tenant']['id']
+            project = project['tenant']
+            print "Project Name: %s" % project['name']
+            print "project ID: %s" % project['id']
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
