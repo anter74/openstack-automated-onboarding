@@ -98,7 +98,7 @@ def main():
 
         # Update quotas using templateVars data
         url = str(identity.getServiceURL(token,"nova")) + "/os-quota-sets/%s" % project['id']
-        jsonPayload = json.dumps({"quota_set": {"instances": templateVars['instances'], "cores": templateVars['cores'], "ram": templateVars['ram'], "floating_ips": templateVars['floating_ips']}})
+        jsonPayload = json.dumps({"quota_set": {"instances": templateVars['project']['quota']['instances'], "cores": templateVars['project']['quota']['cores'], "ram": templateVars['project']['quota']['ram'], "floating_ips": templateVars['project']['quota']['floating_ips']}})
         request = http.request(
             'PUT',
             url,headers=headers,
