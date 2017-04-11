@@ -80,16 +80,15 @@ def main():
         users = json.loads(request.data)
         # assign member role to kgreenwell user for new project
         for i in enumerate(templateVars['project']['members']):
-            print i
-            print users
-            if i[1]['name'] in users:
-                print "True"
-                #url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user[1]['id'], memberId)
-                #request = http.request(
-                #    'PUT',
-                #    url,
-                #    headers=headers)
-                #print json.loads(request.data)
+            for user in enumerate(users['users']):
+                if i[1]['name'] in user[1]['name']:
+                    print "True"
+                    #url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user[1]['id'], memberId)
+                    #request = http.request(
+                #        'PUT',
+            #            url,
+        #                headers=headers)
+    #                print json.loads(request.data)
 
     else:
         print "Response Code: %s" % token['code']
