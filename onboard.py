@@ -12,15 +12,15 @@ from osident import osident
 import keystoneclient.v2_0.client as ksclient
 
 def main():
-    #Create jinja2 environment for rendering heat templates
-    #env = Environment(loader = PackageLoader('onboard','templates'), trim_blocks=True)
-    #template = env.get_template('template.j2')
 
-    #Read descriptor yaml file
+    #Read project descriptor yaml file
     stream = file('vars.yml', 'r')
     templateVars = yaml.load(stream)
     stream.close()
 
+    #Create jinja2 environment for rendering heat templates
+    #env = Environment(loader = PackageLoader('onboard','templates'), trim_blocks=True)
+    #template = env.get_template('template.j2')
     #Render jinja2 template to create heat template
     #stream = open('project.yml', 'w')
     #stream.write(template.render(templateVars))
@@ -29,21 +29,25 @@ def main():
     #Create new identity object for OS token management
     identity = osident()
     token = identity.getToken()
+
     if str(token['code']) == "200":
-        # Create openstack project
+        # Set default headers and SSL certificate information for http object
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': str(token['token_id'])}
         http = urllib3.PoolManager(
             cert_reqs = 'CERT_REQUIRED',
             ca_certs = os.environ['OS_CACERT'])
 
+        # Get tenant list and for each tenant returned, compare to project name in templateVars
+        # If project is found, return project name & ID
+        # If no match is found, create project and return project name & ID
         url = str(identity.getAdminURL(token,"keystone")) + "/tenants"
         request = http.request(
             'GET',
             url,
             headers=headers)
-        data = json.loads(request.data)
-        for i in enumerate(data['tenants']):
-            if i[1]['name'] == templateVars['project']['name']:
+        projectList = json.loads(request.data)
+        for i in enumerate(projectList['tenants']):
+            if templateVars['project']['name'] in i[1]['name']:
                 print "%s already exists with ID %s" % (i[1]['name'], i[1]['id'])
                 project = i[1]
                 break
@@ -59,14 +63,15 @@ def main():
             project = project['tenant']
             print "Project Name: %s" % project['name']
             print "project ID: %s" % project['id']
-        # Get user roles
+
+        # Get user roles and pull id from _member_ role
         url = str(identity.getAdminURL(token,"keystone")) + "/OS-KSADM/roles"
         request = http.request(
             'GET',
             url,
             headers=headers)
-        data = json.loads(request.data)
-        for i in enumerate(data['roles']):
+        roles = json.loads(request.data)
+        for i in enumerate(roles['roles']):
             if i[1]['name'] == "_member_":
                 memberId = i[1]['id']
 
@@ -77,11 +82,14 @@ def main():
             url,
             headers=headers)
         users = json.loads(request.data)
-        # assign member role to kgreenwell user for new project
+
+        # assign member role to members from templateVars for new project
+        # For each member in templateVars, iterate over Openstack users and compare name
+        # If a match is found, add _member_ role to user in project matching templateVars
         for i in enumerate(templateVars['project']['members']):
             for user in enumerate(users['users']):
                 if i[1]['name'] in user[1]['name']:
-                    url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user[1]['id'], memberId)
+                    url = str(identity.getAdminURL(token,"keystone")) + "/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user[1]['id'], memberId)
                     request = http.request(
                         'PUT',
                         url,
