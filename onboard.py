@@ -78,8 +78,7 @@ def main():
         request = http.request(
             'PUT',
             url,
-            headers=headers,
-            body=jsonPayload)
+            headers=headers)
         project = json.loads(request.data)
     else:
         print "Response Code: %s" % token['code']
