@@ -9,8 +9,8 @@ project:
     ram: int
     floating_ips: int
   members:
-    - name: string
-      email: string
+    - name: kgreenwell
+      email: kylegwell@gmail.com
   flavors: # Optional custom flavors
     - name: string
       f_cores: int
