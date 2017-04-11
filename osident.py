@@ -46,6 +46,7 @@ class osident:
                 #Pull publicURL from serviceCatalog
                 for k,v in enumerate(service['endpoints']):
                     dictbuilder.update({'publicURL': v['publicURL']})
+                    dictbuilder.update({'adminURL': v['adminURL']})
                 services.append(dictbuilder)
 
             return {'code': req.status, 'token_id': data['access']['token']['id'], 'expires': data['access']['token']['expires'], 'services': services}
@@ -67,4 +68,10 @@ class osident:
     def getServiceURL(self, token, service):
         token = self.refreshToken(token)
         urlBuilder = [i['publicURL'] for i in token['services'] if i['name'] == service]
+        return str(urlBuilder[0])
+
+    #Return admin URL for service
+    def getAdminURL(self, token, service):
+        token = self.refreshToken(token)
+        urlBuilder = [i['adminURL'] for i in token['services'] if i['name'] == service]
         return str(urlBuilder[0])
