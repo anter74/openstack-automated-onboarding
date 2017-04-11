@@ -36,7 +36,7 @@ def main():
             cert_reqs = 'CERT_REQUIRED',
             ca_certs = os.environ['OS_CACERT'])
 
-        #url = str(identity.getAdminURL(token,"keystone")) + "/tenants"
+        url = str(identity.getAdminURL(token,"keystone")) + "/tenants"
         #url = "http://172.16.0.120:35357/v2.0/tenants/"
         request = http.request(
             'GET',
