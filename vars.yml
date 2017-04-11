@@ -3,11 +3,11 @@
 project:
   name: kgreenwell-test
   quota:
-    cores: int
-    instances: int
-    gigabytes: int
-    ram: int
-    floating_ips: int
+    cores: 4
+    instances: 1
+    gigabytes: 100
+    ram: 8192
+    floating_ips: 1
   members:
     - name: kgreenwell
       email: kylegwell@gmail.com
