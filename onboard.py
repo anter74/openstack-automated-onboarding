@@ -67,7 +67,6 @@ def main():
             url,
             headers=headers)
         data = json.loads(request.data)
-        print data
         for i in enumerate(data['roles']):
             if i[1]['name'] == "_member_":
                 memberId = i[1]['id']
@@ -81,15 +80,15 @@ def main():
         users = json.loads(request.data)
         # assign member role to kgreenwell user for new project
         for i in enumerate(templateVars['project']['members']):
-            for user in enumerate(users['users']):
-                print i, user
-                if i['name'] in user['name']:
-                    url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user['id'], memberId)
-                    request = http.request(
-                        'PUT',
-                        url,
-                        headers=headers)
-                    print json.loads(request.data)
+            print i, user
+            if i[1]['name'] in users:
+                print "True"
+                #url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user[1]['id'], memberId)
+                #request = http.request(
+                #    'PUT',
+                #    url,
+                #    headers=headers)
+                #print json.loads(request.data)
 
     else:
         print "Response Code: %s" % token['code']
@@ -113,6 +112,4 @@ if __name__ == "__main__":
   ],
 'token_id': u'01d62302dfc845efaac3da38efbbf785', 'code': 200, 'expires': u'2017-02-10T18:46:59Z'
 }
-kgreenwell user id: 1eac5ee4ba584fe8809710c32ee710d3
-_member_ role: 9fe2ff9ee4384b1894a90878d3e92bab
 '''
