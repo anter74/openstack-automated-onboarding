@@ -56,8 +56,9 @@ def main():
                 url,
                 headers=headers,
                 body=jsonPayload)
-            response = json.loads(request.data)
-            print response
+            project = json.loads(request.data)
+            print "Project Name: %s" % project['tenant']['name']
+            print "project ID: %s" % project['tenant']['id']
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
