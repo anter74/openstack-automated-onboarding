@@ -37,7 +37,6 @@ def main():
             ca_certs = os.environ['OS_CACERT'])
 
         url = str(identity.getAdminURL(token,"keystone")) + "/tenants"
-        #url = "http://172.16.0.120:35357/v2.0/tenants/"
         request = http.request(
             'GET',
             url,
@@ -49,7 +48,7 @@ def main():
                 project = i[1]
                 break
         else:
-            url = "http://172.16.0.120:35357/v2.0/tenants"
+            url = str(identity.getAdminURL(token,"keystone")) + "/tenants"
             jsonPayload = json.dumps({ "tenant": { "name": templateVars['project']['name'], "Description": "Created with onboard.py", "enabled": True}})
             request = http.request(
                 'POST',
@@ -61,7 +60,7 @@ def main():
             print "Project Name: %s" % project['name']
             print "project ID: %s" % project['id']
         # Get user roles
-        url = "http://172.16.0.120:35357/v2.0/OS-KSADM/roles"
+        url = str(identity.getAdminURL(token,"keystone")) + "/OS-KSADM/roles"
         request = http.request(
             'GET',
             url,
@@ -72,7 +71,7 @@ def main():
                 memberId = i[1]['id']
 
         # get openstack user list
-        url = "http://172.16.0.120:35357/v2.0/users"
+        url = str(identity.getAdminURL(token,"keystone")) + "/users"
         request = http.request(
             'GET',
             url,
