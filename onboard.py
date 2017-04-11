@@ -73,7 +73,7 @@ def main():
                 memberId = i[1]['id']
 
         # get openstack user list
-        url = "http://172.16.0.120:35357/v2.0/users
+        url = "http://172.16.0.120:35357/v2.0/users"
         request = http.request(
             'GET',
             url,
