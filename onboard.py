@@ -94,7 +94,17 @@ def main():
                         'PUT',
                         url,
                         headers=headers)
-                    print request.status, json.loads(request.data)
+                    print "Response from OpenStack: %s" % request.status
+
+        # Update quotas using templateVars data
+        url = str(identity.getServiceURL(token,"nova")) + "/os-quota-sets/%s" % project['id']
+        jsonPayload = json.dumps({"quota_set": {"instances": templateVars['instances'], "cores": templateVars['cores'], "ram": templateVars['ram'], "floating_ips": templateVars['floating_ips']}})
+        request = http.request(
+            'PUT',
+            url,headers=headers,
+            body=jsonPayload)
+        print "Response from Openstack: %s" % request.status
+        print "Raw response data: %s" % json.loads(request.data)
 
     else:
         print "Response Code: %s" % token['code']
