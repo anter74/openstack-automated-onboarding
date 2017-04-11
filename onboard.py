@@ -68,7 +68,10 @@ def main():
             headers=headers)
         data = json.loads(request.data)
         print data
-        #for i in enumerate(data['tenants']):
+        for i in enumerate(data['roles']):
+            if i[1]['name'] == "_member_":
+                memberId = i[1]['id']
+                print "%s role has id %s" % (i[1]['name'], i[1]['id'])
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
