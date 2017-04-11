@@ -47,6 +47,7 @@ def main():
             if i[1]['name'] == templateVars['project']['name']:
                 print "%s already exists with ID %s" % (i[1]['name'], i[1]['id'])
                 print "Project %s already exists... Moving on" % i[1]['name']
+                project = i[1]
                 break
         else:
             url = "http://172.16.0.120:35357/v2.0/tenants"
@@ -56,9 +57,9 @@ def main():
                 url,
                 headers=headers,
                 body=jsonPayload)
-            project = json.loads(request.data)
-            print "Project Name: %s" % project['tenant']['name']
-            print "project ID: %s" % project['tenant']['id']
+            project = json.loads(request.data['tenant'])
+            print "Project Name: %s" % project['name']
+            print "project ID: %s" % project['id']
     else:
         print "Response Code: %s" % token['code']
         print "Failure Reason: %s" % token['data']
