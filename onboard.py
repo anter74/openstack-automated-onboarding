@@ -97,6 +97,8 @@ def main():
                     print "Response from OpenStack: %s" % request.status
 
         # Update quotas using templateVars data
+        # This will update all quotas except those related to block storage
+        # FUTURE: Add volume related quota API call? Is this necessary or relevant?
         url = str(identity.getServiceURL(token,"nova")) + "/os-quota-sets/%s" % project['id']
         jsonPayload = json.dumps({"quota_set": {"instances": templateVars['project']['quota']['instances'], "cores": templateVars['project']['quota']['cores'], "ram": templateVars['project']['quota']['ram'], "floating_ips": templateVars['project']['quota']['floating_ips']}})
         request = http.request(
