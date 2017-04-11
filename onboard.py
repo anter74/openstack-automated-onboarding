@@ -82,8 +82,9 @@ def main():
         # assign member role to kgreenwell user for new project
         for i in enumerate(templateVars['project']['members']):
             for user in enumerate(users['users']):
+                print i, user
                 if i['name'] in user['name']:
-                    url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user, memberId)
+                    url = "http://172.16.0.120:35357/v2.0/tenants/%s/users/%s/roles/OS-KSADM/%s" % (project['id'], user['id'], memberId)
                     request = http.request(
                         'PUT',
                         url,
