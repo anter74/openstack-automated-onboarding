@@ -114,20 +114,3 @@ def main():
 
 if __name__ == "__main__":
    main()
-
-'''
-{
-  'services': [
-    {'name': u'nova', 'publicURL': u'https://10.75.25.138:13774/v2.1/20187e9020f64f5594e605fde94d8283'},
-    {'name': u'neutron', 'publicURL': u'https://10.75.25.138:13696/'},
-    {'name': u'cinderv2', 'publicURL': u'https://10.75.25.138:13776/v2/20187e9020f64f5594e605fde94d8283'},
-    {'name': u'glance', 'publicURL': u'https://10.75.25.138:13292/'},
-    {'name': u'ceilometer', 'publicURL': u'https://10.75.25.138:13777/'},
-    {'name': u'cinder', 'publicURL': u'https://10.75.25.138:13776/v1/20187e9020f64f5594e605fde94d8283'},
-    {'name': u'heat', 'publicURL': u'https://10.75.25.138:13004/v1/20187e9020f64f5594e605fde94d8283'},
-    {'name': u'swift', 'publicURL': u'https://10.75.25.138:13808/v1/AUTH_20187e9020f64f5594e605fde94d8283'},
-    {'name': u'keystone', 'publicURL': u'https://10.75.25.138:13000/v2.0'}
-  ],
-'token_id': u'01d62302dfc845efaac3da38efbbf785', 'code': 200, 'expires': u'2017-02-10T18:46:59Z'
-}
-'''
